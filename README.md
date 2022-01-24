@@ -2,19 +2,29 @@ Autor: Martin Omar Paz - 2022
 # Introduction
 This proyect is for no-country organization
 
-# Requeriments
+## Table of contents
+* [Requeriments](#requeriments)
+* [Run](#run)
+* [Contributing](#contribution)
+* [HELP](#help)
+
+## Requeriments
 ```sh
 postgresql
 go
 ```
 
-# Run
+## Run
 Para correr la aplicación es necesario ejecutar el siguiente comando:
 ```sh
 go run main.go
 ```
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-# HELP
+Please make sure to update tests as appropriate.
+
+## HELP
 
 **DB CONFIG EXAMPLE**
 
@@ -26,14 +36,16 @@ DB_NAME="no-country"
 
 **GET ALL USERS**
 
+`GET`
 ```
-http://localhost:9000/api/v1/users/
+http://localhost:9000/api/v1/users/ 
 ```
 
 **ADD USER**
 
+`POST`
 ```
-http://localhost:9000/api/v1/users/ *POST*
+http://localhost:9000/api/v1/users/ 
 ```
 
 {
@@ -46,8 +58,9 @@ http://localhost:9000/api/v1/users/ *POST*
 
 **UPDATE USER**
 
+`PUT`
 ```
-http://localhost:9000/api/v1/users/{id} *PUT* 
+http://localhost:9000/api/v1/users/{id} 
 ```
 example: http://localhost:9000/api/v1/users/1
 
@@ -60,12 +73,14 @@ example: http://localhost:9000/api/v1/users/1
 
 **DELETE USER**
 
+`DELETE`
 ```
-http://localhost:9000/api/v1/users/{id} *DELETE*
+http://localhost:9000/api/v1/users/{id}
 ```
 
 **ADD RECIPE**
 
+`POST`
 ```
 http://localhost:8000/api/v1/posts/ *POST*
 ```
@@ -83,14 +98,16 @@ http://localhost:8000/api/v1/posts/ *POST*
 
 **LIKE RECIPE**
 
+`PUT`
 ```
-http://localhost:8000/api/v1/posts/like/{id} *PUT*
+http://localhost:8000/api/v1/posts/like/{id}
 ```
 
 **COMMENT**
 
+`POST`
 ```
-http://localhost:8000/api/v1/comment/{id} *POST*
+http://localhost:8000/api/v1/comment/{id}
 ```
 
 {
@@ -99,14 +116,16 @@ http://localhost:8000/api/v1/comment/{id} *POST*
     "comment": "horrible"
 }
 
-**GET ALL RECIPE's COMMENTS"
+**GET ALL RECIPE's COMMENTS**
 
+`GET`
 ```
 http://localhost:8000/api/v1/comment/{id} *GET*
 ```
 
 **DELETE COMMENT**
 
+`DELETE`
 ```
 http://localhost:8000/api/v1/comment/{id} *DELETE*
 ```
