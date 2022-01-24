@@ -3,6 +3,7 @@ package data
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/martinpaz/restfulapi/pkg/post"
@@ -17,7 +18,7 @@ type PostRepository struct {
 // GetAll returns all posts.
 func (pr *PostRepository) GetAll(ctx context.Context) ([]post.Post, error) {
 	q := `
-	SELECT id, body, user_id, created_at, updated_at
+	SELECT recipe_name, recipe_type, user_id , ingredients, description, thumbnail, likes, created_at, updated_at
 		FROM posts;
 	`
 
@@ -31,7 +32,13 @@ func (pr *PostRepository) GetAll(ctx context.Context) ([]post.Post, error) {
 	var posts []post.Post
 	for rows.Next() {
 		var p post.Post
-		rows.Scan(&p.ID, &p.Body, &p.UserID, &p.CreatedAt, &p.UpdatedAt)
+		var array_ingredients, array_description string
+
+		rows.Scan(&p.Recipe_name, &p.Recipe_type, &p.UserID, &array_ingredients, &array_description, &p.Thumbnail, &p.Likes, &p.CreatedAt, &p.UpdatedAt)
+
+		p.Ingredients = strings.Split(array_ingredients, "$$$")
+		p.Description = strings.Split(array_description, "$$$")
+
 		posts = append(posts, p)
 	}
 
@@ -41,17 +48,29 @@ func (pr *PostRepository) GetAll(ctx context.Context) ([]post.Post, error) {
 // GetOne returns one post by id.
 func (pr *PostRepository) GetOne(ctx context.Context, id uint) (post.Post, error) {
 	q := `
-	SELECT id, body, user_id, created_at, updated_at
+	SELECT id, recipe_name, recipe_type, user_id , ingredients, description, thumbnail, likes, created_at, updated_at
 		FROM posts WHERE id = $1;
 	`
 
 	row := pr.Data.DB.QueryRowContext(ctx, q, id)
 
 	var p post.Post
-	err := row.Scan(&p.ID, &p.Body, &p.UserID, &p.CreatedAt, &p.UpdatedAt)
+	var array_ingredients, array_description string
+	//var likes_count int
+
+	err := row.Scan(&p.ID, &p.Recipe_name, &p.Recipe_type, &p.UserID, &array_ingredients, &array_description, &p.Thumbnail, &p.Likes, &p.CreatedAt, &p.UpdatedAt)
+
 	if err != nil {
 		return post.Post{}, err
 	}
+
+	/*fmt.Printf("count:%d\n", likes_count)
+	if likes_count == 0 {
+		p.Likes = 0
+	}*/
+
+	p.Ingredients = strings.Split(array_ingredients, "$$$")
+	p.Description = strings.Split(array_description, "$$$")
 
 	return p, nil
 }
@@ -74,7 +93,7 @@ func (pr *PostRepository) GetByUser(ctx context.Context, userID uint) ([]post.Po
 	var posts []post.Post
 	for rows.Next() {
 		var p post.Post
-		rows.Scan(&p.ID, &p.Body, &p.UserID, &p.CreatedAt, &p.UpdatedAt)
+		rows.Scan(&p.UserID, &p.Recipe_name, &p.Description, &p.CreatedAt, &p.UpdatedAt)
 		posts = append(posts, p)
 	}
 
@@ -84,9 +103,38 @@ func (pr *PostRepository) GetByUser(ctx context.Context, userID uint) ([]post.Po
 // Create adds a new post.
 func (pr *PostRepository) Create(ctx context.Context, p *post.Post) error {
 	q := `
-	INSERT INTO posts (body, user_id, created_at, updated_at)
-		VALUES ($1, $2, $3, $4)
+	INSERT INTO posts (recipe_name, recipe_type, user_id, ingredients, description, thumbnail, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id;
+	`
+
+	if p.Thumbnail == "" {
+		p.Thumbnail = "https://food.unl.edu/newsletters/images/mise-en-plase.jpg"
+	}
+
+	stmt, err := pr.Data.DB.PrepareContext(ctx, q)
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	row := stmt.QueryRowContext(ctx, p.Recipe_name, p.Recipe_type, p.UserID, strings.Join(p.Ingredients, "$$$"), strings.Join(p.Description, "$$$"), p.Thumbnail, time.Now(), time.Now())
+
+	err = row.Scan(&p.UserID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Create adds a new like.
+func (pr *PostRepository) UpdateLike(ctx context.Context, id uint) error {
+	q := `
+	UPDATE posts
+		SET likes=likes+1
+		WHERE id=$1;
 	`
 
 	stmt, err := pr.Data.DB.PrepareContext(ctx, q)
@@ -96,9 +144,7 @@ func (pr *PostRepository) Create(ctx context.Context, p *post.Post) error {
 
 	defer stmt.Close()
 
-	row := stmt.QueryRowContext(ctx, p.Body, p.UserID, time.Now(), time.Now())
-
-	err = row.Scan(&p.ID)
+	_, err = stmt.ExecContext(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -121,7 +167,7 @@ func (pr *PostRepository) Update(ctx context.Context, id uint, p post.Post) erro
 	defer stmt.Close()
 
 	_, err = stmt.ExecContext(
-		ctx, p.Body, time.Now(), id,
+		ctx, p.Description, time.Now(), id,
 	)
 	if err != nil {
 		return err
@@ -148,3 +194,36 @@ func (pr *PostRepository) Delete(ctx context.Context, id uint) error {
 
 	return nil
 }
+
+// GetRank returns all posts.
+func (pr *PostRepository) GetRank(ctx context.Context) ([]post.Post, error) {
+	q := `
+	SELECT recipe_name, recipe_type, user_id , thumbnail, likes, created_at, updated_at
+	FROM posts
+	ORDER BY likes DESC
+	LIMIT 10
+	`
+
+	rows, err := pr.Data.DB.QueryContext(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var posts []post.Post
+	for rows.Next() {
+		var p post.Post
+
+		rows.Scan(&p.Recipe_name, &p.Recipe_type, &p.UserID, &p.Thumbnail, &p.Likes, &p.CreatedAt, &p.UpdatedAt)
+
+		posts = append(posts, p)
+	}
+
+	return posts, nil
+}
+
+/*SELECT recipe_name, recipe_type, likes, id
+FROM posts
+ORDER BY likes DESC
+LIMIT 10*/

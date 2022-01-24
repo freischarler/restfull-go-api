@@ -11,11 +11,34 @@ import (
 	"github.com/martinpaz/restfulapi/pkg/response"
 )
 
-
-
 // PostRouter is the router of the posts.
 type PostRouter struct {
 	Repository post.Repository
+}
+
+// Routes returns post router with each endpoint.
+func (pr *PostRouter) Routes() http.Handler {
+	r := chi.NewRouter()
+
+	r.Get("/user/{userId}", pr.GetByUserHandler)
+
+	r.Get("/", pr.GetAllHandler)
+
+	r.Get("/rank", pr.GetRankHandler)
+
+	r.Post("/", pr.CreateHandler)
+
+	r.Post("/comment/{id}", pr.CreateCommentHandler)
+
+	r.Get("/{id}", pr.GetOneHandler)
+
+	r.Put("/like/{id}", pr.UpdateLikeHandler)
+
+	r.Put("/{id}", pr.UpdateHandler)
+
+	r.Delete("/{id}", pr.DeleteHandler)
+
+	return r
 }
 
 // CreateHandler Create a new post.
@@ -30,14 +53,40 @@ func (pr *PostRouter) CreateHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	ctx := r.Context()
+
 	err = pr.Repository.Create(ctx, &p)
 	if err != nil {
 		response.HTTPError(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	w.Header().Add("Location", fmt.Sprintf("%s%d", r.URL.String(), p.ID))
+	w.Header().Add("Location", fmt.Sprintf("%s%s", r.URL.String(), p.Recipe_name))
 	response.JSON(w, r, http.StatusCreated, response.Map{"post": p})
+}
+
+// CreateHandler Create a new post.
+func (cr *PostRouter) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+// CreateHandler Create a new post.
+func (pr *PostRouter) UpdateLikeHandler(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		response.HTTPError(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	ctx := r.Context()
+	err = pr.Repository.UpdateLike(ctx, uint(id))
+	if err != nil {
+		response.HTTPError(w, r, http.StatusNotFound, err.Error())
+		return
+	}
+
+	response.JSON(w, r, http.StatusOK, nil)
 }
 
 // GetAllHandler response all the posts.
@@ -50,7 +99,20 @@ func (pr *PostRouter) GetAllHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.JSON(w, r, http.StatusOK, response.Map{"posts": posts})
+	response.JSON(w, r, http.StatusOK, response.Map{"recipe": posts})
+}
+
+// GetAllHandler response all the posts.
+func (pr *PostRouter) GetRankHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	posts, err := pr.Repository.GetRank(ctx)
+	if err != nil {
+		response.HTTPError(w, r, http.StatusNotFound, err.Error())
+		return
+	}
+
+	response.JSON(w, r, http.StatusOK, response.Map{"recipe": posts})
 }
 
 // GetOneHandler response one post by id.
@@ -70,7 +132,7 @@ func (pr *PostRouter) GetOneHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.JSON(w, r, http.StatusOK, response.Map{"post": p})
+	response.JSON(w, r, http.StatusOK, response.Map{"recipe": p})
 }
 
 // UpdateHandler update a stored post by id.
@@ -140,23 +202,4 @@ func (pr *PostRouter) GetByUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.JSON(w, r, http.StatusOK, response.Map{"posts": posts})
-}
-
-// Routes returns post router with each endpoint.
-func (pr *PostRouter) Routes() http.Handler {
-	r := chi.NewRouter()
-
-	r.Get("/user/{userId}", pr.GetByUserHandler)
-
-	r.Get("/", pr.GetAllHandler)
-
-	r.Post("/", pr.CreateHandler)
-
-	r.Get("/{id}", pr.GetOneHandler)
-
-	r.Put("/{id}", pr.UpdateHandler)
-
-	r.Delete("/{id}", pr.DeleteHandler)
-
-	return r
 }

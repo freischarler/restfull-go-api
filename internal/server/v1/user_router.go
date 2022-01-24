@@ -17,6 +17,23 @@ type UserRouter struct {
 	Repository user.Repository
 }
 
+// Routes returns user router with each endpoint.
+func (ur *UserRouter) Routes() http.Handler {
+	r := chi.NewRouter()
+
+	r.Get("/", ur.GetAllHandler)
+
+	r.Post("/", ur.CreateHandler)
+
+	r.Get("/{id}", ur.GetOneHandler)
+
+	r.Put("/{id}", ur.UpdateHandler)
+
+	r.Delete("/{id}", ur.DeleteHandler)
+
+	return r
+}
+
 // CreateHandler Create a new user.
 func (ur *UserRouter) CreateHandler(w http.ResponseWriter, r *http.Request) {
 	var u user.User
@@ -120,21 +137,4 @@ func (ur *UserRouter) DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.JSON(w, r, http.StatusOK, response.Map{})
-}
-
-// Routes returns user router with each endpoint.
-func (ur *UserRouter) Routes() http.Handler {
-	r := chi.NewRouter()
-
-	r.Get("/", ur.GetAllHandler)
-
-	r.Post("/", ur.CreateHandler)
-
-	r.Get("/{id}", ur.GetOneHandler)
-
-	r.Put("/{id}", ur.UpdateHandler)
-
-	r.Delete("/{id}", ur.DeleteHandler)
-
-	return r
 }

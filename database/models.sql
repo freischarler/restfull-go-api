@@ -13,10 +13,24 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS posts (
     id serial NOT NULL,
+    recipe_name VARCHAR(50) NOT NULL,
+    recipe_type VARCHAR(50) NOT NULL,
     user_id int NOT NULL,
-    body text NOT NULL,
+    ingredients text NOT NULL,
+    description text NOT NULL,
+    thumbnail text,
+    likes int DEFAULT 0,
     created_at timestamp DEFAULT now(),
     updated_at timestamp NOT NULL,
     CONSTRAINT pk_notes PRIMARY KEY(id),
     CONSTRAINT fk_posts_users FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+    id serial NOT NULL,
+    recipe_id int NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    comment text,
+    CONSTRAINT pk_comentary PRIMARY KEY(id),
+    CONSTRAINT fk_recipe FOREIGN KEY(recipe_id) REFERENCES posts(id)
 );
