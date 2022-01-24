@@ -2,11 +2,11 @@ package data
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/martinpaz/restfulapi/pkg/user"
 )
-
 
 // UserRepository manages the operations with the database that
 // correspond to the user model.
@@ -67,7 +67,7 @@ func (ur *UserRepository) GetByUsername(ctx context.Context, username string) (u
 		password, created_at, updated_at
 		FROM users WHERE username = $1;
 	`
-
+	log.Printf("XXXXXXXX")
 	row := ur.Data.DB.QueryRowContext(ctx, q, username)
 
 	var u user.User
