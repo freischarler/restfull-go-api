@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	v1 "github.com/martinpaz/restfulapi/internal/server/v1"
 )
 
@@ -18,6 +19,8 @@ type Server struct {
 // New inicialize a new server with configuration.
 func New(port string) (*Server, error) {
 	r := chi.NewRouter()
+	r.Use(middleware.Logger)    //logs por consola de las peticiones
+	r.Use(middleware.Recoverer) //it can recover the server after panics
 	r.Mount("/api/v1", v1.New())
 
 	serv := &http.Server{

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi"
 
+	"github.com/martinpaz/restfulapi/pkg/claim"
 	"github.com/martinpaz/restfulapi/pkg/response"
 	"github.com/martinpaz/restfulapi/pkg/user"
 )
@@ -23,6 +24,8 @@ func (ur *UserRouter) Routes() http.Handler {
 
 	r.Get("/", ur.GetAllHandler)
 
+	//r.With(middleware.Authorizator).Post("/", ur.CreateHandler)
+
 	r.Post("/", ur.CreateHandler)
 
 	r.Get("/{id}", ur.GetOneHandler)
@@ -31,7 +34,44 @@ func (ur *UserRouter) Routes() http.Handler {
 
 	r.Delete("/{id}", ur.DeleteHandler)
 
+	r.Post("/login/", ur.LoginHandler)
+
 	return r
+}
+
+// LoginHandler search user and return a jwt.
+func (ur *UserRouter) LoginHandler(w http.ResponseWriter, r *http.Request) {
+	var u user.User
+
+	err := json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		response.HTTPError(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	defer r.Body.Close()
+
+	ctx := r.Context()
+	storedUser, err := ur.Repository.GetByUsername(ctx, u.Username)
+	if err != nil {
+		response.HTTPError(w, r, http.StatusNotFound, err.Error())
+		return
+	}
+
+	if !storedUser.PasswordMatch(u.Password) {
+		response.HTTPError(w, r, http.StatusBadRequest, "password don't match")
+		return
+	}
+
+	c := claim.Claim{ID: int(storedUser.ID)}
+	//token, err := c.GetToken(os.Getenv("SIGNING_STRING"))
+	token, err := c.GetToken("SECRET")
+	if err != nil {
+		response.HTTPError(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	response.JSON(w, r, http.StatusOK, response.Map{"token": token})
 }
 
 // CreateHandler Create a new user.
