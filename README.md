@@ -1,12 +1,13 @@
 Autor: Martin Omar Paz - 2022
 # Introduction
-This proyect is for no-country organization
+This proyect is for no-country organization.
+Reference: https://dev.to/orlmonteverde/api-rest-con-go-golang-y-postgresql-m0o
 
 ## Table of contents
 * [Requeriments](#requeriments)
 * [Run](#run)
-* [Contributing](#contribution)
-* [HELP](#help)
+* [Contributing](#contributing)
+* [Help](#help)
 
 ## Requeriments
 ```sh
@@ -24,7 +25,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
-## HELP
+## Help
 
 **DB CONFIG EXAMPLE**
 
