@@ -1,40 +1,117 @@
-**OBTENER TODOS LOS USUARIOS**
+Autor: Martin Omar Paz - 2022
+# Introduction
+This proyect is for no-country organization
 
-curl http://localhost:9000/api/v1/users/
+# Requeriments
+```sh
+postgresql
+go
+```
 
-**CREAR USUARIO**
+# Run
+Para correr la aplicación es necesario ejecutar el siguiente comando:
+```sh
+go run main.go
+```
 
+# HELP
+
+**DB CONFIG EXAMPLE**
+
+DB_HOST="127.0.0.1"
+DB_PORT=5432
+DB_USER="postgres"
+DB_PASSWORD="root"
+DB_NAME="no-country"
+
+**GET ALL USERS**
+
+```
+http://localhost:9000/api/v1/users/
+```
+
+**ADD USER**
+
+```
 http://localhost:9000/api/v1/users/ *POST*
+```
 
 {
     "first_name": "Martin",
     "last_name": "Paz",
-    "username": "freischarler",
-    "email": "martin.paz@live.com.ar",
+    "username": "freis",
+    "email": "martin.paz@live.com",
     "password": "123456"
 }
 
+**UPDATE USER**
 
-**ACTUALIZAR USUARIO**
-
-http://localhost:9000/api/v1/users/2 *PUT*
+```
+http://localhost:9000/api/v1/users/{id} *PUT* 
+```
+example: http://localhost:9000/api/v1/users/1
 
 {
     "first_name": "Nicole",
     "last_name": "Mockert",
-    "email": "NICOMO",
+    "email": "nic@gmai.com",
     "picture": "DASdsadasdsadsa"
 }
 
-  
+**DELETE USER**
 
-**ELIMINAR USUARIO**
+```
+http://localhost:9000/api/v1/users/{id} *DELETE*
+```
 
-http://localhost:9000/api/v1/users/2 *DELETE*
+**ADD RECIPE**
 
-**CREAR RECETA**
-
+```
 http://localhost:8000/api/v1/posts/ *POST*
+```
+
+
+{
+    "recipe_name": "g",
+    "recipe_type": "g",
+    "thumbnail": "g",
+    "ingredients": ["g", "a"],
+    "description": ["g.","a."],
+    "user_id": 2
+}
+
+
+**LIKE RECIPE**
+
+```
+http://localhost:8000/api/v1/posts/like/{id} *PUT*
+```
+
+**COMMENT**
+
+```
+http://localhost:8000/api/v1/comment/{id} *POST*
+```
+
+{
+    "recipe_id": 1,
+    "name": "troll",
+    "comment": "horrible"
+}
+
+**GET ALL RECIPE's COMMENTS"
+
+```
+http://localhost:8000/api/v1/comment/{id} *GET*
+```
+
+**DELETE COMMENT**
+
+```
+http://localhost:8000/api/v1/comment/{id} *DELETE*
+```
+
+**RECIPE EXAMPLES**
 
 {
     "recipe_name": "Aros de Cebolla y Calabazas",
@@ -63,16 +140,6 @@ http://localhost:8000/api/v1/posts/ *POST*
     "user_id": 1
 }
 
-{
-    "recipe_name": "a",
-    "recipe_type": a",
-    "thumbnail": "https://dam.cocinafacil.com.mx/wp-content/uploads/2019/01/palomitas-con-chipotle-veganas.jpg",
-    "ingredients": ["ab", "cd", "d""],
-    "description": ["aaa", "bbb"],
-    "user_id": 1
-}
 
-**LIKE RECETA**
 
-http://localhost:8000/api/v1/posts/like/1 *PUT*
 

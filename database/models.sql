@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS comments (
     recipe_id int NOT NULL,
     name VARCHAR(50) NOT NULL,
     comment text,
+    created_at timestamp DEFAULT now(),
     CONSTRAINT pk_comentary PRIMARY KEY(id),
-    CONSTRAINT fk_recipe FOREIGN KEY(recipe_id) REFERENCES posts(id)
+    CONSTRAINT fk_comments_posts FOREIGN KEY(recipe_id) REFERENCES posts(id)
 );

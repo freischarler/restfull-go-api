@@ -27,5 +27,13 @@ func New() http.Handler {
 
 	r.Mount("/posts", pr.Routes())
 
+	cr := &CommentRouter{
+		Repository: &data.CommentRepository{
+			Data: data.New(),
+		},
+	}
+
+	r.Mount("/comment", cr.Routes())
+
 	return r
 }

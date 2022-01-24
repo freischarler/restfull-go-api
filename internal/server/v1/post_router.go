@@ -28,8 +28,6 @@ func (pr *PostRouter) Routes() http.Handler {
 
 	r.Post("/", pr.CreateHandler)
 
-	r.Post("/comment/{id}", pr.CreateCommentHandler)
-
 	r.Get("/{id}", pr.GetOneHandler)
 
 	r.Put("/like/{id}", pr.UpdateLikeHandler)
@@ -62,11 +60,6 @@ func (pr *PostRouter) CreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Location", fmt.Sprintf("%s%s", r.URL.String(), p.Recipe_name))
 	response.JSON(w, r, http.StatusCreated, response.Map{"post": p})
-}
-
-// CreateHandler Create a new post.
-func (cr *PostRouter) CreateCommentHandler(w http.ResponseWriter, r *http.Request) {
-
 }
 
 // CreateHandler Create a new post.
