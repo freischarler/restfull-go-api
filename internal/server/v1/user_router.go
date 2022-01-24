@@ -65,7 +65,7 @@ func (ur *UserRouter) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	c := claim.Claim{ID: int(storedUser.ID)}
 	//token, err := c.GetToken(os.Getenv("SIGNING_STRING"))
-	token, err := c.GetToken("SECRET")
+	token, err := c.GetToken("SECRET") //hardcoded
 	if err != nil {
 		response.HTTPError(w, r, http.StatusInternalServerError, err.Error())
 		return

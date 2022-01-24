@@ -35,6 +35,30 @@ DB_USER="postgres"
 DB_PASSWORD="root"
 DB_NAME="no-country"
 
+**LOGIN**
+
+`POST`
+```
+http://localhost:9000/api/v1/users/login/
+```
+
+{
+    "username": "freis",
+    "password": "123",
+}
+
+It return:
+```
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MX0.Qi0Tc-jTChzascHaZhl0e6rRaCvAS6OJ8RLsI8Y-R78"
+}
+```
+
+Use it as
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MX0.Qi0Tc-jTChzascHaZhl0e6rRaCvAS6OJ8RLsI8Y-R22'
+```
+
 **GET ALL USERS**
 
 `GET`
@@ -102,6 +126,13 @@ http://localhost:8000/api/v1/posts/ *POST*
 `PUT`
 ```
 http://localhost:8000/api/v1/posts/like/{id}
+```
+
+**TOP 10 RECIPE's**
+
+`POST`
+```
+http://localhost:8000/api/v1/posts/rank *POST*
 ```
 
 **COMMENT**
