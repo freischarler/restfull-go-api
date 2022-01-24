@@ -26,6 +26,8 @@ func (pr *PostRouter) Routes() http.Handler {
 
 	r.Get("/rank", pr.GetRankHandler)
 
+	r.Get("/type/{id}", pr.GetTypeHandler)
+
 	r.Post("/", pr.CreateHandler)
 
 	r.Get("/{id}", pr.GetOneHandler)
@@ -120,6 +122,20 @@ func (pr *PostRouter) GetOneHandler(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	p, err := pr.Repository.GetOne(ctx, uint(id))
+	if err != nil {
+		response.HTTPError(w, r, http.StatusNotFound, err.Error())
+		return
+	}
+
+	response.JSON(w, r, http.StatusOK, response.Map{"recipe": p})
+}
+
+// GetTypeHandler response one post by type.
+func (pr *PostRouter) GetTypeHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	fmt.Print(id)
+	ctx := r.Context()
+	p, err := pr.Repository.GetByType(ctx, id)
 	if err != nil {
 		response.HTTPError(w, r, http.StatusNotFound, err.Error())
 		return

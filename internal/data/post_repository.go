@@ -100,6 +100,37 @@ func (pr *PostRepository) GetByUser(ctx context.Context, userID uint) ([]post.Po
 	return posts, nil
 }
 
+// GetByUser returns all user posts.
+func (pr *PostRepository) GetByType(ctx context.Context, recipeTYPE string) ([]post.Post, error) {
+	q := `
+	SELECT recipe_name, recipe_type, user_id , ingredients, description, thumbnail, likes, created_at, updated_at
+		FROM posts
+		WHERE recipe_type = $1;
+	`
+
+	rows, err := pr.Data.DB.QueryContext(ctx, q, recipeTYPE)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var posts []post.Post
+	for rows.Next() {
+		var p post.Post
+		var array_ingredients, array_description string
+
+		rows.Scan(&p.Recipe_name, &p.Recipe_type, &p.UserID, &array_ingredients, &array_description, &p.Thumbnail, &p.Likes, &p.CreatedAt, &p.UpdatedAt)
+
+		p.Ingredients = strings.Split(array_ingredients, "$$$")
+		p.Description = strings.Split(array_description, "$$$")
+
+		posts = append(posts, p)
+	}
+
+	return posts, nil
+}
+
 // Create adds a new post.
 func (pr *PostRepository) Create(ctx context.Context, p *post.Post) error {
 	q := `

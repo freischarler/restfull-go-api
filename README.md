@@ -103,11 +103,24 @@ example: http://localhost:9000/api/v1/users/1
 http://localhost:9000/api/v1/users/{id}
 ```
 
+**GET ALL RECIPES**
+`GET`
+```
+http://localhost:8000/api/v1/posts/
+```
+
+**GET RECIPES by TYPE**
+`GET`
+```
+http://localhost:8000/api/v1/posts/{id}
+```
+example: http://localhost:8000/api/v1/posts/Carnes
+
 **ADD RECIPE**
 
 `POST`
 ```
-http://localhost:8000/api/v1/posts/ *POST*
+http://localhost:8000/api/v1/posts/ 
 ```
 
 
@@ -132,7 +145,7 @@ http://localhost:8000/api/v1/posts/like/{id}
 
 `POST`
 ```
-http://localhost:8000/api/v1/posts/rank *POST*
+http://localhost:8000/api/v1/posts/rank 
 ```
 
 **COMMENT**
@@ -152,14 +165,14 @@ http://localhost:8000/api/v1/comment/{id}
 
 `GET`
 ```
-http://localhost:8000/api/v1/comment/{id} *GET*
+http://localhost:8000/api/v1/comment/{id} 
 ```
 
 **DELETE COMMENT**
 
 `DELETE`
 ```
-http://localhost:8000/api/v1/comment/{id} *DELETE*
+http://localhost:8000/api/v1/comment/{id} 
 ```
 
 **RECIPE EXAMPLES**
@@ -191,6 +204,14 @@ http://localhost:8000/api/v1/comment/{id} *DELETE*
     "user_id": 1
 }
 
+{
+    "recipe_name": "Costillas de cerdo a la barbacoa",
+    "recipe_type": "Carnes",
+    "thumbnail": "https://dam.cocinafacil.com.mx/wp-content/uploads/2015/05/costillas-de-cerdo-barbecue.jpg",
+    "ingredients": ["Un costillar de costilla corta de cerdo", "1 taza de cátsu", "2 cucharadas de azúca","1 cucharada de salsa maggi"," 1 cucharada de salsa inglesa","1 cucharada de soya","2 cucharadas de salsa ahumada","2 cucharadas de aceite"],
+    "description": ["Cuece las costillas en agua hasta que llegue al hervor y cuece por cinco minutos más.","Mezcla los ingredientes restantes y baña las costillas.","Hornea durante 1 hora a 170oC, trocea y sirve."],
+    "user_id": 1
+}
 
 
 
