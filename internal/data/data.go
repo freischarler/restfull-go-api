@@ -1,9 +1,11 @@
 package data
 
 import (
-	"database/sql"
+	"context"
 	"log"
 	"sync"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
@@ -13,7 +15,7 @@ var (
 
 // Data manages the connection to the database.
 type Data struct {
-	DB *sql.DB
+	DB *mongo.Client
 }
 
 func initDB() {
@@ -22,14 +24,15 @@ func initDB() {
 		log.Panic(err)
 	}
 
-	err = MakeMigration(db)
+	/*err = MakeMigration(db)
 	if err != nil {
 		log.Panic(err)
-	}
+	}*/
 
 	data = &Data{
 		DB: db,
 	}
+	
 }
 
 func New() *Data {
@@ -44,5 +47,9 @@ func Close() error {
 		return nil
 	}
 
-	return data.DB.Close()
+	return data.DB.Disconnect(context.TODO())
+}
+
+func Collection() *mongo.Collection {
+	return data.DB.Database("pokeworld").Collection("pokemons")
 }

@@ -1,22 +1,10 @@
-CREATE TABLE IF NOT EXISTS users (
-    id serial NOT NULL,
-    first_name VARCHAR(150) NOT NULL,
-    last_name VARCHAR(150) NOT NULL,
-    username VARCHAR(150) NOT NULL UNIQUE,
-    password varchar(256) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
-    picture VARCHAR(256) NOT NULL,
-    created_at timestamp DEFAULT now(),
-    updated_at timestamp NOT NULL,
-    CONSTRAINT pk_users PRIMARY KEY(id)
-);
+use pokeworld
 
-CREATE TABLE IF NOT EXISTS posts (
-    id serial NOT NULL,
-    user_id int NOT NULL,
-    body text NOT NULL,
-    created_at timestamp DEFAULT now(),
-    updated_at timestamp NOT NULL,
-    CONSTRAINT pk_notes PRIMARY KEY(id),
-    CONSTRAINT fk_posts_users FOREIGN KEY(user_id) REFERENCES users(id)
-);
+db.createCollection("pokemons")
+
+db.pokemons.insertMany([
+    { name: "Squirtle", type: "Water", health: 44 },
+    { name: "Poliwag", type: "Water", health: 40 },
+    { name: "Bulbasaur", type: "Grass", health: 45 },
+    { name: "Pidgey", type: "Flying", health: 40 }
+])

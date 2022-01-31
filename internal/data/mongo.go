@@ -2,26 +2,24 @@
 package data
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"io/ioutil"
 
 	// registering database driver
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func getConnection() (*sql.DB, error) {
+func getConnection() (*mongo.Client, error) {
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		"127.0.0.1",
-		5432,
-		"postgres",
-		"root",
-		"no-country")
+	host := "localhost"
+	port := 27017
 
-	//uri := os.Getenv("DATABASE_URI")
-
-	return sql.Open("postgres", psqlInfo)
+	clientOpts := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d", host, port))
+	return mongo.Connect(context.TODO(), clientOpts)
 }
 
 func MakeMigration(db *sql.DB) error {

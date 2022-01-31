@@ -11,21 +11,13 @@ import (
 func New() http.Handler {
 	r := chi.NewRouter()
 
-	ur := &UserRouter{
-		Repository: &data.UserRepository{
+	ur := &PokemonRouter{
+		Repository: &data.PokemonRepository{
 			Data: data.New(),
 		},
 	}
 
 	r.Mount("/users", ur.Routes())
-
-	pr := &PostRouter{
-		Repository: &data.PostRepository{
-			Data: data.New(),
-		},
-	}
-
-	r.Mount("/posts", pr.Routes())
 
 	return r
 }

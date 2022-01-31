@@ -3,46 +3,45 @@ package data
 import (
 	"context"
 	"log"
-	"time"
 
-	"github.com/martinpaz/restfulapi/pkg/user"
+	"github.com/martinpaz/restfulapi/pkg/pokemon"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// UserRepository manages the operations with the database that
+// PokemonRepository manages the operations with the database that
 // correspond to the user model.
-type UserRepository struct {
+type PokemonRepository struct {
 	Data *Data
 }
 
 // GetAll returns all users.
-func (ur *UserRepository) GetAll(ctx context.Context) ([]user.User, error) {
-	q := `
-	SELECT id, first_name, last_name, username, email, picture,
-		created_at, updated_at
-		FROM users;
-	`
+func (ur *PokemonRepository) GetAll(ctx context.Context) ([]pokemon.Pokemon, error) {
+	findOptions := options.Find()
+	findOptions.SetLimit(2)
 
-	rows, err := ur.Data.DB.QueryContext(ctx, q)
+	rows, err := Collection().Find(ctx, bson.D{{}}, findOptions)
 	if err != nil {
 		return nil, err
 	}
 
-	defer rows.Close()
+	var pokemons []pokemon.Pokemon
 
-	var users []user.User
-	for rows.Next() {
-		var u user.User
-		rows.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username,
-			&u.Email, &u.Picture, &u.CreatedAt, &u.UpdatedAt)
-		users = append(users, u)
+	for rows.Next(ctx) {
+		var p pokemon.Pokemon
+		err := rows.Decode(&p)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pokemons = append(pokemons, p)
 	}
 
-	return users, nil
+	return pokemons, nil
 }
 
 // GetOne returns one user by id.
-func (ur *UserRepository) GetOne(ctx context.Context, id uint) (user.User, error) {
-	q := `
+func (ur *PokemonRepository) GetOne(ctx context.Context, id uint) (pokemon.Pokemon, error) {
+	/*q := `
 	SELECT id, first_name, last_name, username, email, picture,
 		created_at, updated_at
 		FROM users WHERE id = $1;
@@ -50,39 +49,40 @@ func (ur *UserRepository) GetOne(ctx context.Context, id uint) (user.User, error
 
 	row := ur.Data.DB.QueryRowContext(ctx, q, id)
 
-	var u user.User
-	err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username, &u.Email,
-		&u.Picture, &u.CreatedAt, &u.UpdatedAt)
-	if err != nil {
-		return user.User{}, err
-	}
+	*/var u pokemon.Pokemon
+	/*
+		err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username, &u.Email,
+			&u.Picture, &u.CreatedAt, &u.UpdatedAt)
+		if err != nil {
+			return pokemon.Pokemon{}, err
+		}*/
 
 	return u, nil
 }
 
 // GetByUsername returns one user by username.
-func (ur *UserRepository) GetByUsername(ctx context.Context, username string) (user.User, error) {
-	q := `
+func (ur *PokemonRepository) GetByName(ctx context.Context, username string) (pokemon.Pokemon, error) {
+	/*q := `
 	SELECT id, first_name, last_name, username, email, picture,
 		password, created_at, updated_at
 		FROM users WHERE username = $1;
 	`
-	log.Printf("XXXXXXXX")
+
 	row := ur.Data.DB.QueryRowContext(ctx, q, username)
 
-	var u user.User
-	err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username,
+	*/var u pokemon.Pokemon
+	/*err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username,
 		&u.Email, &u.Picture, &u.PasswordHash, &u.CreatedAt, &u.UpdatedAt)
 	if err != nil {
-		return user.User{}, err
-	}
+		return pokemon.Pokemon{}, err
+	}*/
 
 	return u, nil
 }
 
 // Create adds a new user.
-func (ur *UserRepository) Create(ctx context.Context, u *user.User) error {
-	q := `
+func (ur *PokemonRepository) Create(ctx context.Context, u *pokemon.Pokemon) error {
+	/*q := `
 	INSERT INTO users (first_name, last_name, username, email, picture, password, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id;
@@ -110,14 +110,14 @@ func (ur *UserRepository) Create(ctx context.Context, u *user.User) error {
 	err = row.Scan(&u.ID)
 	if err != nil {
 		return err
-	}
+	}*/
 
 	return nil
 }
 
 // Update updates a user by id.
-func (ur *UserRepository) Update(ctx context.Context, id uint, u user.User) error {
-	q := `
+func (ur *PokemonRepository) Update(ctx context.Context, id uint, u pokemon.Pokemon) error {
+	/*q := `
 	UPDATE users set first_name=$1, last_name=$2, email=$3, picture=$4, updated_at=$5
 		WHERE id=$6;
 	`
@@ -135,14 +135,14 @@ func (ur *UserRepository) Update(ctx context.Context, id uint, u user.User) erro
 	)
 	if err != nil {
 		return err
-	}
+	}*/
 
 	return nil
 }
 
 // Delete removes a user by id.
-func (ur *UserRepository) Delete(ctx context.Context, id uint) error {
-	q := `DELETE FROM users WHERE id=$1;`
+func (ur *PokemonRepository) Delete(ctx context.Context, id uint) error {
+	/*q := `DELETE FROM users WHERE id=$1;`
 
 	stmt, err := ur.Data.DB.PrepareContext(ctx, q)
 	if err != nil {
@@ -154,7 +154,7 @@ func (ur *UserRepository) Delete(ctx context.Context, id uint) error {
 	_, err = stmt.ExecContext(ctx, id)
 	if err != nil {
 		return err
-	}
+	}*/
 
 	return nil
 }

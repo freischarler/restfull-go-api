@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"os/signal"
@@ -18,7 +19,9 @@ func main() {
 
 	// connection to the database.
 	d := data.New()
-	if err := d.DB.Ping(); err != nil {
+	// Check the connections
+	err = d.DB.Ping(context.TODO(), nil)
+	if err != nil {
 		log.Fatal(err)
 	}
 

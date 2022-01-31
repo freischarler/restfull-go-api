@@ -10,17 +10,17 @@ import (
 
 	"github.com/martinpaz/restfulapi/internal/middleware"
 	"github.com/martinpaz/restfulapi/pkg/claim"
+	"github.com/martinpaz/restfulapi/pkg/pokemon"
 	"github.com/martinpaz/restfulapi/pkg/response"
-	"github.com/martinpaz/restfulapi/pkg/user"
 )
 
-// UserRouter is the router of the users.
-type UserRouter struct {
-	Repository user.Repository
+// PokemonRouter is the router of the users.
+type PokemonRouter struct {
+	Repository pokemon.Repository
 }
 
 // Routes returns user router with each endpoint.
-func (ur *UserRouter) Routes() http.Handler {
+func (ur *PokemonRouter) Routes() http.Handler {
 	r := chi.NewRouter()
 
 	r.Get("/", ur.GetAllHandler)
@@ -39,8 +39,8 @@ func (ur *UserRouter) Routes() http.Handler {
 }
 
 // LoginHandler search user and return a jwt.
-func (ur *UserRouter) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var u user.User
+func (ur *PokemonRouter) LoginHandler(w http.ResponseWriter, r *http.Request) {
+	var u pokemon.Pokemon
 
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
@@ -51,7 +51,7 @@ func (ur *UserRouter) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	ctx := r.Context()
-	storedUser, err := ur.Repository.GetByUsername(ctx, u.Username)
+	storedUser, err := ur.Repository.GetByName(ctx, u.Name)
 	if err != nil {
 		response.HTTPError(w, r, http.StatusNotFound, err.Error())
 		return
@@ -74,8 +74,8 @@ func (ur *UserRouter) LoginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateHandler Create a new user.
-func (ur *UserRouter) CreateHandler(w http.ResponseWriter, r *http.Request) {
-	var u user.User
+func (ur *PokemonRouter) CreateHandler(w http.ResponseWriter, r *http.Request) {
+	var u pokemon.Pokemon
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
 		response.HTTPError(w, r, http.StatusBadRequest, err.Error())
@@ -97,7 +97,7 @@ func (ur *UserRouter) CreateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetAllHandler response all the users.
-func (ur *UserRouter) GetAllHandler(w http.ResponseWriter, r *http.Request) {
+func (ur *PokemonRouter) GetAllHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	users, err := ur.Repository.GetAll(ctx)
 	if err != nil {
@@ -109,7 +109,7 @@ func (ur *UserRouter) GetAllHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetOneHandler response one user by id.
-func (ur *UserRouter) GetOneHandler(w http.ResponseWriter, r *http.Request) {
+func (ur *PokemonRouter) GetOneHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 
 	id, err := strconv.Atoi(idStr)
@@ -129,7 +129,7 @@ func (ur *UserRouter) GetOneHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateHandler update a stored user by id.
-func (ur *UserRouter) UpdateHandler(w http.ResponseWriter, r *http.Request) {
+func (ur *PokemonRouter) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 
 	id, err := strconv.Atoi(idStr)
@@ -138,7 +138,7 @@ func (ur *UserRouter) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var u user.User
+	var u pokemon.Pokemon
 	err = json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
 		response.HTTPError(w, r, http.StatusBadRequest, err.Error())
@@ -158,7 +158,7 @@ func (ur *UserRouter) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteHandler Remove a user by ID.
-func (ur *UserRouter) DeleteHandler(w http.ResponseWriter, r *http.Request) {
+func (ur *PokemonRouter) DeleteHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 
 	id, err := strconv.Atoi(idStr)
