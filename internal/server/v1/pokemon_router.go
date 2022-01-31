@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-chi/chi"
 
-	"github.com/martinpaz/restfulapi/internal/middleware"
 	"github.com/martinpaz/restfulapi/pkg/claim"
 	"github.com/martinpaz/restfulapi/pkg/pokemon"
 	"github.com/martinpaz/restfulapi/pkg/response"
@@ -25,13 +24,15 @@ func (ur *PokemonRouter) Routes() http.Handler {
 
 	r.Get("/", ur.GetAllHandler)
 
-	r.With(middleware.Authorizator).Post("/", ur.CreateHandler)
+	r.Post("/", ur.CreateHandler)
 
 	r.Get("/{id}", ur.GetOneHandler)
 
-	r.With(middleware.Authorizator).Put("/{id}", ur.UpdateHandler)
+	//r.With(middleware.Authorizator).Put("/{id}", ur.UpdateHandler)
+	r.Put("/{id}", ur.UpdateHandler)
 
-	r.With(middleware.Authorizator).Delete("/{id}", ur.DeleteHandler)
+	//r.With(middleware.Authorizator).Delete("/{id}", ur.DeleteHandler)
+	r.Delete("/{id}", ur.DeleteHandler)
 
 	r.Post("/login/", ur.LoginHandler)
 
@@ -125,7 +126,7 @@ func (ur *PokemonRouter) GetOneHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.JSON(w, r, http.StatusOK, response.Map{"user": u})
+	response.JSON(w, r, http.StatusOK, response.Map{"pokemon": u})
 }
 
 // UpdateHandler update a stored user by id.

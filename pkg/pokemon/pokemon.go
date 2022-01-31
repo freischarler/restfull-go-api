@@ -11,7 +11,7 @@ type Pokemon struct {
 	ID           int       `json:"id,omitempty"`
 	Name         string    `json:"name,omitempty"`
 	Element      string    `json:"element,omitempty"`
-	Health       int       `json:"healt,omitempty"`
+	Health       int       `json:"health,omitempty"`
 	Picture      string    `json:"picture,omitempty"`
 	Password     string    `json:"password,omitempty"`
 	PasswordHash string    `json:"-"`

@@ -2,7 +2,9 @@ package data
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/martinpaz/restfulapi/pkg/pokemon"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,7 +12,7 @@ import (
 )
 
 // PokemonRepository manages the operations with the database that
-// correspond to the user model.
+// correspond to the pokemon model.
 type PokemonRepository struct {
 	Data *Data
 }
@@ -18,7 +20,7 @@ type PokemonRepository struct {
 // GetAll returns all users.
 func (ur *PokemonRepository) GetAll(ctx context.Context) ([]pokemon.Pokemon, error) {
 	findOptions := options.Find()
-	findOptions.SetLimit(2)
+	findOptions.SetLimit(10)
 
 	rows, err := Collection().Find(ctx, bson.D{{}}, findOptions)
 	if err != nil {
@@ -39,109 +41,77 @@ func (ur *PokemonRepository) GetAll(ctx context.Context) ([]pokemon.Pokemon, err
 	return pokemons, nil
 }
 
-// GetOne returns one user by id.
+// GetOne returns one pokemon by id.
 func (ur *PokemonRepository) GetOne(ctx context.Context, id uint) (pokemon.Pokemon, error) {
-	/*q := `
-	SELECT id, first_name, last_name, username, email, picture,
-		created_at, updated_at
-		FROM users WHERE id = $1;
-	`
 
-	row := ur.Data.DB.QueryRowContext(ctx, q, id)
+	//filter := bson.D{primitive.E{Key: "health", Value: id}}
+	filter := bson.M{"health": id}
+	var p pokemon.Pokemon
 
-	*/var u pokemon.Pokemon
-	/*
-		err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username, &u.Email,
-			&u.Picture, &u.CreatedAt, &u.UpdatedAt)
-		if err != nil {
-			return pokemon.Pokemon{}, err
-		}*/
+	err := Collection().FindOne(ctx, filter).Decode(&p)
+	if err != nil {
+		return pokemon.Pokemon{}, err
+	}
 
-	return u, nil
+	return p, nil
 }
 
 // GetByUsername returns one user by username.
-func (ur *PokemonRepository) GetByName(ctx context.Context, username string) (pokemon.Pokemon, error) {
-	/*q := `
-	SELECT id, first_name, last_name, username, email, picture,
-		password, created_at, updated_at
-		FROM users WHERE username = $1;
-	`
+func (ur *PokemonRepository) GetByName(ctx context.Context, pokemon_name string) (pokemon.Pokemon, error) {
+	filter := bson.M{"name": pokemon_name}
+	var p pokemon.Pokemon
 
-	row := ur.Data.DB.QueryRowContext(ctx, q, username)
-
-	*/var u pokemon.Pokemon
-	/*err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username,
-		&u.Email, &u.Picture, &u.PasswordHash, &u.CreatedAt, &u.UpdatedAt)
+	err := Collection().FindOne(ctx, filter).Decode(&p)
 	if err != nil {
 		return pokemon.Pokemon{}, err
-	}*/
+	}
 
-	return u, nil
+	return p, nil
 }
 
 // Create adds a new user.
-func (ur *PokemonRepository) Create(ctx context.Context, u *pokemon.Pokemon) error {
-	/*q := `
-	INSERT INTO users (first_name, last_name, username, email, picture, password, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-		RETURNING id;
-	`
+func (ur *PokemonRepository) Create(ctx context.Context, p *pokemon.Pokemon) error {
 
-	if u.Picture == "" {
-		u.Picture = "https://placekitten.com/g/300/300"
-	}
+	p.CreatedAt = time.Now()
+	p.UpdatedAt = time.Now()
 
-	if err := u.HashPassword(); err != nil {
-		return err
-	}
-
-	stmt, err := ur.Data.DB.PrepareContext(ctx, q)
+	insertResult, err := Collection().InsertOne(context.TODO(), p)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
-	defer stmt.Close()
-
-	row := stmt.QueryRowContext(ctx, u.FirstName, u.LastName, u.Username, u.Email,
-		u.Picture, u.PasswordHash, time.Now(), time.Now(),
-	)
-
-	err = row.Scan(&u.ID)
-	if err != nil {
-		return err
-	}*/
+	fmt.Println("Inserted a single document: ", insertResult.InsertedID)
 
 	return nil
 }
 
 // Update updates a user by id.
-func (ur *PokemonRepository) Update(ctx context.Context, id uint, u pokemon.Pokemon) error {
-	/*q := `
-	UPDATE users set first_name=$1, last_name=$2, email=$3, picture=$4, updated_at=$5
-		WHERE id=$6;
-	`
+func (ur *PokemonRepository) Update(ctx context.Context, id uint, p pokemon.Pokemon) error {
+	filter := bson.M{"id": id}
 
-	stmt, err := ur.Data.DB.PrepareContext(ctx, q)
+	replacementObj := p
+
+	//This is not an update, this function reemplace the whole object/document
+	updateResult, err := Collection().ReplaceOne(ctx, filter, replacementObj)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
-	defer stmt.Close()
-
-	_, err = stmt.ExecContext(
-		ctx, u.FirstName, u.LastName, u.Email,
-		u.Picture, time.Now(), id,
-	)
-	if err != nil {
-		return err
-	}*/
+	fmt.Printf("Matched %v documents and updated %v documents.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
 
 	return nil
 }
 
 // Delete removes a user by id.
 func (ur *PokemonRepository) Delete(ctx context.Context, id uint) error {
+	filter := bson.M{"id": id}
+
+	deleteResult, err := Collection().DeleteOne(ctx, filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Deleted %v documents in the trainers collection\n", deleteResult.DeletedCount)
+
 	/*q := `DELETE FROM users WHERE id=$1;`
 
 	stmt, err := ur.Data.DB.PrepareContext(ctx, q)
