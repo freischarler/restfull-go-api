@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS messages (
     lastname VARCHAR(50) NULL,
     email VARCHAR(150) NOT NULL,
     phone VARCHAR(100) NULL,
-    message TEXT NULL
+    message VARCHAR NULL,
     created_at timestamp DEFAULT now()
 );
 

@@ -87,7 +87,7 @@ func (pr *PostRepository) GetByUser(ctx context.Context, userID uint) ([]post.Po
 func (pr *PostRepository) Create(ctx context.Context, p *post.Post) error {
 	q := `
 	INSERT INTO messages (firstname, lastname, email, phone, message, created_at)
-		VALUES ($1, $2, $3, $4)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id;
 	`
 
