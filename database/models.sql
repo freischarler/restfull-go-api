@@ -28,6 +28,16 @@ CREATE TABLE IF NOT EXISTS user_roles (
     CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS messages (
+    id serial NOT NULL,
+    firstname VARCHAR(50) NULL,
+    lastname VARCHAR(50) NULL,
+    email VARCHAR(150) NOT NULL,
+    phone VARCHAR(100) NULL,
+    message TEXT NULL
+    created_at timestamp DEFAULT now()
+);
+
 INSERT INTO roles VALUES (1, 'user', now(), now())  ON CONFLICT DO NOTHING;
 INSERT INTO roles VALUES (2, 'moderator', now(), now())  ON CONFLICT DO NOTHING;
 INSERT INTO roles VALUES (3, 'admin', now(), now())  ON CONFLICT DO NOTHING;

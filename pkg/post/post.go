@@ -6,8 +6,10 @@ import "time"
 // Post created by a user.
 type Post struct {
 	ID        uint      `json:"id,omitempty"`
-	Body      string    `json:"body,omitempty"`
-	UserID    uint      `json:"user_id,omitempty"`
+	Firstname string    `json:"firstname,omitempty"`
+	Lastname  string    `json:"lastname,omitempty"`
+	Email     string    `json:"email,omitempty"`
+	Phone     string    `json:"phone,omitempty"`
+	Message   string    `json:"message,omitempty"`
 	CreatedAt time.Time `json:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
 }

@@ -16,7 +16,7 @@ type PostRepository struct {
 
 // GetAll returns all posts.
 func (pr *PostRepository) GetAll(ctx context.Context) ([]post.Post, error) {
-	q := `
+	/*q := `
 	SELECT id, body, user_id, created_at, updated_at
 		FROM posts;
 	`
@@ -34,13 +34,14 @@ func (pr *PostRepository) GetAll(ctx context.Context) ([]post.Post, error) {
 		rows.Scan(&p.ID, &p.Body, &p.UserID, &p.CreatedAt, &p.UpdatedAt)
 		posts = append(posts, p)
 	}
-
+	*/
+	var posts []post.Post
 	return posts, nil
 }
 
 // GetOne returns one post by id.
 func (pr *PostRepository) GetOne(ctx context.Context, id uint) (post.Post, error) {
-	q := `
+	/*q := `
 	SELECT id, body, user_id, created_at, updated_at
 		FROM posts WHERE id = $1;
 	`
@@ -52,13 +53,14 @@ func (pr *PostRepository) GetOne(ctx context.Context, id uint) (post.Post, error
 	if err != nil {
 		return post.Post{}, err
 	}
-
+	*/
+	var p post.Post
 	return p, nil
 }
 
 // GetByUser returns all user posts.
 func (pr *PostRepository) GetByUser(ctx context.Context, userID uint) ([]post.Post, error) {
-	q := `
+	/*q := `
 	SELECT id, body, user_id, created_at, updated_at
 		FROM posts
 		WHERE user_id = $1;
@@ -76,15 +78,15 @@ func (pr *PostRepository) GetByUser(ctx context.Context, userID uint) ([]post.Po
 		var p post.Post
 		rows.Scan(&p.ID, &p.Body, &p.UserID, &p.CreatedAt, &p.UpdatedAt)
 		posts = append(posts, p)
-	}
-
+	}*/
+	var posts []post.Post
 	return posts, nil
 }
 
 // Create adds a new post.
 func (pr *PostRepository) Create(ctx context.Context, p *post.Post) error {
 	q := `
-	INSERT INTO posts (body, user_id, created_at, updated_at)
+	INSERT INTO messages (firstname, lastname, email, phone, message, created_at)
 		VALUES ($1, $2, $3, $4)
 		RETURNING id;
 	`
@@ -96,7 +98,7 @@ func (pr *PostRepository) Create(ctx context.Context, p *post.Post) error {
 
 	defer stmt.Close()
 
-	row := stmt.QueryRowContext(ctx, p.Body, p.UserID, time.Now(), time.Now())
+	row := stmt.QueryRowContext(ctx, p.Firstname, p.Lastname, p.Email, p.Phone, p.Message, time.Now())
 
 	err = row.Scan(&p.ID)
 	if err != nil {
@@ -108,7 +110,7 @@ func (pr *PostRepository) Create(ctx context.Context, p *post.Post) error {
 
 // Update updates a post by id.
 func (pr *PostRepository) Update(ctx context.Context, id uint, p post.Post) error {
-	q := `
+	/*q := `
 	UPDATE posts set body=$1, updated_at=$2
 		WHERE id=$3;
 	`
@@ -125,14 +127,14 @@ func (pr *PostRepository) Update(ctx context.Context, id uint, p post.Post) erro
 	)
 	if err != nil {
 		return err
-	}
+	}*/
 
 	return nil
 }
 
 // Delete removes a post by id.
 func (pr *PostRepository) Delete(ctx context.Context, id uint) error {
-	q := `DELETE FROM posts WHERE id=$1;`
+	/*q := `DELETE FROM posts WHERE id=$1;`
 
 	stmt, err := pr.Data.DB.PrepareContext(ctx, q)
 	if err != nil {
@@ -144,7 +146,7 @@ func (pr *PostRepository) Delete(ctx context.Context, id uint) error {
 	_, err = stmt.ExecContext(ctx, id)
 	if err != nil {
 		return err
-	}
+	}*/
 
 	return nil
 }
