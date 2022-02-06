@@ -25,7 +25,7 @@ func (ur *UserRouter) Routes() http.Handler {
 
 	r.Get("/", ur.GetAllHandler)
 
-	r.With(middleware.Authorizator).Post("/", ur.CreateHandler)
+	r.Post("/", ur.CreateHandler)
 
 	r.Get("/{id}", ur.GetOneHandler)
 
@@ -70,7 +70,7 @@ func (ur *UserRouter) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.JSON(w, r, http.StatusOK, response.Map{"token": token})
+	response.JSON(w, r, http.StatusOK, response.Map{"id": storedUser.ID, "username": storedUser.Username, "email": storedUser.Email, "roles": storedUser.Roles, "token": token})
 }
 
 // CreateHandler Create a new user.

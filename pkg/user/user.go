@@ -10,13 +10,12 @@ import (
 // User of the system.
 type User struct {
 	ID           uint      `json:"id,omitempty"`
-	FirstName    string    `json:"first_name,omitempty"`
-	LastName     string    `json:"last_name,omitempty"`
 	Username     string    `json:"username,omitempty"`
 	Email        string    `json:"email,omitempty"`
 	Picture      string    `json:"picture,omitempty"`
 	Password     string    `json:"password,omitempty"`
 	PasswordHash string    `json:"-"`
+	Roles        []string  `json:"roles,omitempty"`
 	CreatedAt    time.Time `json:"created_at,omitempty"`
 	UpdatedAt    time.Time `json:"updated_at,omitempty"`
 }

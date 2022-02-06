@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/martinpaz/restfulapi/pkg/user"
@@ -17,7 +16,7 @@ type UserRepository struct {
 // GetAll returns all users.
 func (ur *UserRepository) GetAll(ctx context.Context) ([]user.User, error) {
 	q := `
-	SELECT id, first_name, last_name, username, email, picture,
+	SELECT id, username, email, picture,
 		created_at, updated_at
 		FROM users;
 	`
@@ -32,7 +31,7 @@ func (ur *UserRepository) GetAll(ctx context.Context) ([]user.User, error) {
 	var users []user.User
 	for rows.Next() {
 		var u user.User
-		rows.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username,
+		rows.Scan(&u.ID, &u.Username,
 			&u.Email, &u.Picture, &u.CreatedAt, &u.UpdatedAt)
 		users = append(users, u)
 	}
@@ -43,7 +42,7 @@ func (ur *UserRepository) GetAll(ctx context.Context) ([]user.User, error) {
 // GetOne returns one user by id.
 func (ur *UserRepository) GetOne(ctx context.Context, id uint) (user.User, error) {
 	q := `
-	SELECT id, first_name, last_name, username, email, picture,
+	SELECT id, username, email, picture,
 		created_at, updated_at
 		FROM users WHERE id = $1;
 	`
@@ -51,7 +50,7 @@ func (ur *UserRepository) GetOne(ctx context.Context, id uint) (user.User, error
 	row := ur.Data.DB.QueryRowContext(ctx, q, id)
 
 	var u user.User
-	err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username, &u.Email,
+	err := row.Scan(&u.ID, &u.Username, &u.Email,
 		&u.Picture, &u.CreatedAt, &u.UpdatedAt)
 	if err != nil {
 		return user.User{}, err
@@ -63,19 +62,42 @@ func (ur *UserRepository) GetOne(ctx context.Context, id uint) (user.User, error
 // GetByUsername returns one user by username.
 func (ur *UserRepository) GetByUsername(ctx context.Context, username string) (user.User, error) {
 	q := `
-	SELECT id, first_name, last_name, username, email, picture,
+	SELECT id, username, email, picture,
 		password, created_at, updated_at
 		FROM users WHERE username = $1;
 	`
-	log.Printf("XXXXXXXX")
 	row := ur.Data.DB.QueryRowContext(ctx, q, username)
 
 	var u user.User
-	err := row.Scan(&u.ID, &u.FirstName, &u.LastName, &u.Username,
+	err := row.Scan(&u.ID, &u.Username,
 		&u.Email, &u.Picture, &u.PasswordHash, &u.CreatedAt, &u.UpdatedAt)
 	if err != nil {
 		return user.User{}, err
 	}
+
+	q = `
+	SELECT name
+	FROM user_roles
+	INNER JOIN roles 
+	ON user_roles.role_id=roles.id
+	WHERE
+	user_id=$1;
+	`
+
+	rows, err := ur.Data.DB.QueryContext(ctx, q, u.ID)
+	if err != nil {
+		return user.User{}, err
+	}
+
+	var roles []string
+	var data string
+
+	for rows.Next() {
+		rows.Scan(&data)
+		roles = append(roles, data)
+	}
+
+	u.Roles = roles
 
 	return u, nil
 }
@@ -83,8 +105,8 @@ func (ur *UserRepository) GetByUsername(ctx context.Context, username string) (u
 // Create adds a new user.
 func (ur *UserRepository) Create(ctx context.Context, u *user.User) error {
 	q := `
-	INSERT INTO users (first_name, last_name, username, email, picture, password, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+	INSERT INTO users (username, email, picture, password, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id;
 	`
 
@@ -103,7 +125,7 @@ func (ur *UserRepository) Create(ctx context.Context, u *user.User) error {
 
 	defer stmt.Close()
 
-	row := stmt.QueryRowContext(ctx, u.FirstName, u.LastName, u.Username, u.Email,
+	row := stmt.QueryRowContext(ctx, u.Username, u.Email,
 		u.Picture, u.PasswordHash, time.Now(), time.Now(),
 	)
 
@@ -118,7 +140,7 @@ func (ur *UserRepository) Create(ctx context.Context, u *user.User) error {
 // Update updates a user by id.
 func (ur *UserRepository) Update(ctx context.Context, id uint, u user.User) error {
 	q := `
-	UPDATE users set first_name=$1, last_name=$2, email=$3, picture=$4, updated_at=$5
+	UPDATE users set , email=$3, picture=$4, updated_at=$5
 		WHERE id=$6;
 	`
 
@@ -130,7 +152,7 @@ func (ur *UserRepository) Update(ctx context.Context, id uint, u user.User) erro
 	defer stmt.Close()
 
 	_, err = stmt.ExecContext(
-		ctx, u.FirstName, u.LastName, u.Email,
+		ctx, u.Email,
 		u.Picture, time.Now(), id,
 	)
 	if err != nil {

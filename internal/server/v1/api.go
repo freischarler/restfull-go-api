@@ -27,5 +27,13 @@ func New() http.Handler {
 
 	r.Mount("/posts", pr.Routes())
 
+	rr := &RoleRouter{
+		Repository: &data.RoleRepository{
+			Data: data.New(),
+		},
+	}
+
+	r.Mount("/role", rr.Routes())
+
 	return r
 }
