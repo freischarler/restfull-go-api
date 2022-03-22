@@ -38,5 +38,4 @@ func (rr *RoleRepository) GetRole(ctx context.Context, id uint) ([]string, error
 	}
 
 	return roles, nil
-
 }

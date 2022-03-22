@@ -42,8 +42,7 @@ INSERT INTO roles VALUES (1, 'user', now(), now())  ON CONFLICT DO NOTHING;
 INSERT INTO roles VALUES (2, 'moderator', now(), now())  ON CONFLICT DO NOTHING;
 INSERT INTO roles VALUES (3, 'admin', now(), now())  ON CONFLICT DO NOTHING;
 
-INSERT INTO users VALUES (1, 'test', '$2a$10$n48Uhbhqmmb9rKf4IF7lYea0wPQOgZd0JC30Om4xceFOyXIoFm0/q', 'test@test.com', 'https://placekitten.com/g/300/300', false, now(), now()) ON CONFLICT DO NOTHING;
-INSERT INTO users VALUES (2, 'freis', '$2a$10$n48Uhbhqmmb9rKf4IF7lYea0wPQOgZd0JC30Om4xceFOyXIoFm0/q', 'freis@test.com', 'https://placekitten.com/g/300/300', false, now(), now()) ON CONFLICT DO NOTHING;
+INSERT INTO users VALUES (1, 'freis', '$2a$10$n48Uhbhqmmb9rKf4IF7lYea0wPQOgZd0JC30Om4xceFOyXIoFm0/q', 'freis@test.com', 'https://placekitten.com/g/300/300', false, now(), now()) ON CONFLICT DO NOTHING;
 INSERT INTO user_roles VALUES (1, 1, now(), now()) ON CONFLICT DO NOTHING;
 INSERT INTO user_roles VALUES (1, 3, now(), now()) ON CONFLICT DO NOTHING;
 INSERT INTO user_roles VALUES (2, 3, now(), now()) ON CONFLICT DO NOTHING;
